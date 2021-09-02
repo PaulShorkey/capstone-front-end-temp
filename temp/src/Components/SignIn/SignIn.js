@@ -12,13 +12,19 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { red } from '@material-ui/core/colors';
+import { borders } from '@material-ui/system';
+import { useHistory } from "react-router-dom";
+
+const API_DIRECTORY = "http://localhost:3001";
+const LOGIN_PATH = `/login`;
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Yo Website
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -46,8 +52,57 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+// function loginButton() {
+//   let history = useHistory();
+
+//   function handleClick() {
+//     history.push("/");
+//   }
+// }
+
+export default function SignIn(props) {
   const classes = useStyles();
+
+  console.log(props.history);
+  let handleSubmitClick = (event) => {
+    event.preventDefault();
+
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+
+    let errorMessage = '';
+
+    if (email === undefined || typeof email !== 'string' || email.length < 1) errorMessage += 'Please Provide an Email\n';
+    if (password === undefined || typeof password !== 'string' || password.length < 1) errorMessage += 'Please Provide a Password';
+
+    if (errorMessage.length > 0) {
+      alert(errorMessage);
+    } else {
+      const headers = { 'Content-Type': 'application/json' };
+
+      fetch(`${API_DIRECTORY}${LOGIN_PATH}`, {
+        method: 'POST',
+        mode: 'cors',
+        headers,
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      })
+        .then((result) => {
+          if (result.status === 200) {
+            console.log('Good login credentials');
+            result = result.json()
+              .then((result) => {
+                props.handleLogin(result);
+               // props.history.push("/Home", {loggedIn:true})
+              })
+          } else {
+            console.log('Bad login credentials');
+          }
+        })
+    }
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -92,6 +147,7 @@ export default function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleSubmitClick}
           >
             Sign In
           </Button>
