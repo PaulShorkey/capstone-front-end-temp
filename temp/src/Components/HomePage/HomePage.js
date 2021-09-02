@@ -27,6 +27,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home(){
 
+  // //State for loggedIn user
+  // const [activeUser, setActiveUser]= useState('');
+
+  // //State for messages list in view
+  // const [messages, setMessages] = useState([]);
+  // const [activeGroup, setActiveGroup]= useState('');
+
+
+  
+
+
   const classes = useStyles();
 
     return(

@@ -1,8 +1,15 @@
-import { render, screen } from '@testing-library/react';
+
+import { render, screen} from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('finds AppRouter', () => {
+    
 });
+
+
+// test('Existing paths in App.js', () => {
+//     render(<App />);
+//   //   console.log("POTATO: ", potato)
+//       // const
+//     expect(screen.getByText('link')).toHaveAttribute('href', 'http://localhost:3000/SignUp');
+//     })

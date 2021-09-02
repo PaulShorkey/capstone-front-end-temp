@@ -27,6 +27,14 @@ function ListItemLink(props) {
 export default function GroupSelector() {
   const classes = useStyles();
 
+  // //State for loggedIn user
+  // const [activeUser, setActiveUser]= useState('');
+
+  // //State for messages list in view
+  // const [messages, setMessages] = useState([]);
+  // const [activeGroup, setActiveGroup]= useState('');
+
+
   return (
     <div className={classes.root}>
       <List component="nav" aria-label="main mailbox folders">
@@ -36,7 +44,7 @@ export default function GroupSelector() {
       <Divider />
       <List component="nav" aria-label="secondary mailbox folders">
         {['Group 1', 'Group 2', 'Group 3'].map((text, index) => (
-          <ListItem button key={text}>
+          <ListItem button key={index}>
               <ListItemText primary={text} />
             <ListItemIcon> <DeleteForeverIcon/> </ListItemIcon>            
           </ListItem>
