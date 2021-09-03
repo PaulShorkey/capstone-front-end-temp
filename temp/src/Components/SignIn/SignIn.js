@@ -116,6 +116,23 @@ export default function SignIn(props) {
     }
   }
 
+  let sendMessage = () => {
+    // const headers = { 'Content-Type': 'application/json' };
+
+    // fetch(`https://ec2-54-177-132-229.us-west-1.compute.amazonaws.com/api/send`, {
+    //   method: 'POST',
+    //   mode: 'cors',
+    //   headers,
+    //   body: JSON.stringify({
+    //     recipient: "1111111111",
+    //     message: "Sending this from the app"
+    //   })
+    // })
+    //   .then((result) => {
+    //     console.log(result);
+    //   })
+  }
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -180,6 +197,7 @@ export default function SignIn(props) {
       <Box mt={8}>
         <Copyright />
       </Box>
+      <button onClick={sendMessage}>CLICK ME TO SEND MESSAGE</button>
     </Container>
   );
 }

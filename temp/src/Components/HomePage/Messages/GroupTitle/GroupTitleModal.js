@@ -19,8 +19,10 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import RemoveIcon from '@material-ui/icons/Remove';
+import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import { useState, useEffect } from 'react';
-import { API_DIRECTORY } from '../../../../constants';
+import { API_DIRECTORY, ERROR_MESSAGES } from '../../../../constants';
+
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -38,13 +40,16 @@ const useStyles = makeStyles((theme) => ({
       width: '100%', // Fix IE 11 issue.
       marginTop: theme.spacing(1),
     },
-    root: {
-      '& > *': {
-        margin: theme.spacing(1),
-        width: '25ch',
-      },
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+      width: '25ch',
     },
-    p: {
+    submit: {
+      margin: theme.spacing(3, 0, 2),
+    },
+  },
+  p: {
         fontSize: 12
       }
   }));
@@ -53,23 +58,109 @@ export default function GroupTitleModal(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [addingRecipient, setAddingRecipient] = useState(false);
+  const [languageDataLoaded, setLanguageDataLoaded] = useState(false);
   const [languageData, setLanguageData] = useState([]);
+  const [commMethods, setCommMethods] = useState([]);
+  const [commMethodsLoaded, setCommMethodsLoaded] = useState(false);
+  const [recipientsData, setRecipientsData] = useState([]);
+  const [recipientsDataLoaded, setRecipientsDataLoaded] = useState(false);
 
-  useEffect(() => {
+  const [error, setError] = useState({status: false, message: 'No Error'});
+
+  // *************************************************** FETCH FUNCTIONS **************************************************** //
+  let fetchLanguageData = () => {
     if (languageData.length < 1) {
+      const headers = { 'Content-Type': 'application/json' };
 
-    }
-    
-    const headers = { 'Content-Type': 'application/json' };
-
-    fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.LANGUAGES_TABLE_PATH}`, {
-      method: 'GET',
-      mode: 'cors',
-      headers
-    })
-      .then((result) => {
-        console.log(result);
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.LANGUAGES_TABLE_PATH}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers
       })
+        .then((result) => {
+          if (result.status === 200) {
+            result = result.json()
+              .then((result) => {
+                console.log(result);
+                setLanguageData(result);
+                setLanguageDataLoaded(true);
+              })
+          }
+        },
+          (error) => {
+            setError({ status: true, message: ERROR_MESSAGES.ERROR_UNKNOWN })
+          });
+    }
+  }
+
+  let fetchCommMethodsData = () => {
+    if (commMethods.length < 1) {
+      const headers = { 'Content-Type': 'application/json' };
+
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.PROVIDER_CAPABILITIES_TABLE_PATH}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers
+      })
+        .then((result) => {
+          if (result.status === 200) {
+            result = result.json()
+              .then((result) => {
+                setCommMethods(result);
+                setCommMethodsLoaded(true);
+              })
+          }
+          else if (result.status === 404) {
+            setError({ status: true, message: ERROR_MESSAGES.ERROR_404 })
+            setCommMethodsLoaded(true);
+          } else {
+            setError({ status: true, message: ERROR_MESSAGES.ERROR_UNKNOWN })
+            setCommMethodsLoaded(true);
+          }
+        },
+          (error) => {
+            setError({ status: true, message: ERROR_MESSAGES.ERROR_UNKNOWN })
+            setCommMethodsLoaded(true);
+          });
+    }
+  }
+
+  let fetchRecipientsData = () => {
+    if (recipientsData.length < 1) {
+      const headers = { 'Content-Type': 'application/json' };
+
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_GET_PATH}/${props.groupData.group_id}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers
+      })
+        .then((result) => {
+          if (result.status === 200) {
+            result = result.json()
+              .then((result) => {
+                setRecipientsData(result);
+                setRecipientsDataLoaded(true);
+              })
+          }
+          else if (result.status === 404) {
+            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_404} @ RecipientsData` })
+            setRecipientsDataLoaded(true);
+          } else {
+            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
+            setRecipientsDataLoaded(true);
+          }
+        },
+          (error) => {
+            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
+            setRecipientsDataLoaded(true);
+          });
+    }
+  }
+  // ************************************************* END FETCH FUNCTIONS ************************************************** //
+  useEffect(() => {
+    fetchLanguageData();
+    fetchCommMethodsData();
+    fetchRecipientsData();
   }, []);
 
   const handleOpen = () => {
@@ -113,6 +204,110 @@ export default function GroupTitleModal(props) {
     }
   }
 
+  let renderLanguagesDropDownMenu = () => {
+    if (languageDataLoaded) {
+      return (
+        <form>
+          <label for="language">Language:</label>
+          <select name="language" id="language-drop-down">
+            {
+              languageData.map((item) => {
+                return <option value={`${item.language_id}`}>{`${item.name}`}</option>
+              })
+            }
+          </select>
+
+        </form>
+      );
+    } else {
+      return (
+        <form>
+          <label for="language">Language:</label>
+          <select name="language" id="language-drop-down">
+            <option value="english">English</option>
+            <option value="french">French</option>
+            <option value="desert-speak">Desert-Speak</option>
+          </select>
+
+        </form>
+      );
+    }
+  }
+
+  let renderCommMethodsDropdown = () => {
+    if (commMethodsLoaded) {
+      return (
+        <form>
+          <label for="comm-methods">Comm Method:</label>
+          <select name="comm-methods" id="comm-methods-drop-down">
+            {
+              commMethods.map((item) => {
+                return <option value={`${item.pc_id}`}>{`${item.name}`}</option>
+              })
+            }
+          </select>
+
+        </form>
+      );
+    } else {
+      return (
+        <form>
+          <label for="comm-methods">Language:</label>
+          <select name="comm-methods" id="comm-methods-drop-down">
+          </select>
+
+        </form>
+      );
+    }
+  }
+
+  let handleAddRecipient = (event) => {
+    event.preventDefault();
+
+    let firstName = document.getElementById('first-name-input').value;
+    let lastName = document.getElementById('last-name-input').value;
+    let phoneNumber = document.getElementById('phone-number-input').value;
+    let language = document.getElementById('language-drop-down').value;
+    let commMethod = document.getElementById('comm-methods-drop-down').value;
+
+    console.log(language);
+    console.log(commMethod);
+    let errorMessage = '';
+
+    if (firstName === undefined || typeof firstName !== 'string' || firstName === '') errorMessage += 'Please Provide a Value for First Name\n';
+    if (lastName === undefined || typeof lastName !== 'string' || lastName === '') errorMessage += 'Please Provide a Value for Last Name\n';
+    if (phoneNumber === undefined || typeof phoneNumber !== 'string' || phoneNumber === '') errorMessage += 'Please Provide a Value for Phone Number\n';
+    if (language === undefined || typeof language !== 'string' || language === '') errorMessage += 'Please Select a Language\n';
+    if (commMethod === undefined || typeof commMethod !== 'string' || commMethod === '') errorMessage += 'Please Select a Communication Method';
+
+    if (errorMessage.length > 0) {
+      alert(errorMessage);
+    } else {
+      const headers = { 'Content-Type': 'application/json' };
+
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_POST_PATH}`, {
+        method: 'POST',
+        mode: 'cors',
+        headers,
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          phone_number: phoneNumber,
+          language: language,
+          comm_method: commMethod
+        })
+          
+          })
+          .then((result) => {
+            if (result.status === 200) {
+              console.log('SUCCESS');
+            } else {
+              console.log("FAILURE");
+            }
+      })
+    }
+  }
+
   let renderAddRecipientFields = () => {
     return (
       <form className={classes.form} noValidate>
@@ -121,7 +316,7 @@ export default function GroupTitleModal(props) {
           margin="normal"
           required
           fullWidth
-          id="first-name"
+          id="first-name-input"
           label="First Name"
           name="first-name"
           autoComplete="first name"
@@ -132,7 +327,7 @@ export default function GroupTitleModal(props) {
           margin="normal"
           required
           fullWidth
-          id="last-name"
+          id="last-name-input"
           label="Last Name"
           name="last-name"
           autoComplete="last name"
@@ -143,22 +338,32 @@ export default function GroupTitleModal(props) {
           margin="normal"
           required
           fullWidth
-          id="phone-number"
+          id="phone-number-input"
           label="Phone Number"
           name="phone-number"
           autoComplete="phone number"
           autoFocus
         />
-        <form>
-          <label for="language">Language:</label>
-          <select name="language" id="language">
-            <option value="english">English</option>
-            <option value="french">French</option>
-            <option value="desert-speak">Desert-Speak</option>
-          </select>
-
-        </form>
+        {renderLanguagesDropDownMenu()}
+        {renderCommMethodsDropdown()}
+        <br/>
+        <Button className={classes.submit} onClick={handleAddRecipient}>SUBMIT</Button>
       </form>
+    
+    );
+  }
+
+  let renderRecipients = () => {
+    return (
+      <List component="nav" aria-label="secondary mailbox folders">
+        {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
+          <ListItem button key={text}>
+            <ListItemText primary={text} />
+            <ListItemIcon> <EditIcon /> </ListItemIcon>
+            <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+          </ListItem>
+        ))}
+      </List>
     );
   }
 
@@ -194,15 +399,7 @@ export default function GroupTitleModal(props) {
             <ListItem>
               <ListItemText primary="Select All" />
             </ListItem>
-            <List component="nav" aria-label="secondary mailbox folders">
-              {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
-                <ListItem button key={text}>
-                  <ListItemText primary={text} />
-                  <ListItemIcon> <EditIcon /> </ListItemIcon>
-                  <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
-                </ListItem>
-              ))}
-            </List>
+            {renderRecipients()}
           </List>
         </div>
       </Fade>

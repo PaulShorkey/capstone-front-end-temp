@@ -27,12 +27,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home(){
   const [groupData, setGroupData] = useState({});
-  // //State for loggedIn user
-  // const [activeUser, setActiveUser]= useState('');
-
-  // //State for messages list in view
-  // const [messages, setMessages] = useState([]);
-  // const [activeGroup, setActiveGroup]= useState('');
 
   // ************************************************** CALLBACKS ******************************************************* //
   let updateGroupTitleModal = (data) => {

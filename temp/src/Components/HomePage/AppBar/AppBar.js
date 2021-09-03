@@ -7,6 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import { alpha, makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
+import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
+import { Badge } from '@material-ui/core';
+import ShareIcon from '@material-ui/icons/Share';
 
 /// FILE IMPORTS ///
 import HamburgerMenu from './HamburgerMenu'
@@ -72,6 +75,7 @@ export default function SearchAppBar() {
   return (
     <div className={classes.root}>
       <AppBar position="static">
+      
         <Toolbar>
           <IconButton
             edge="start"
@@ -81,12 +85,26 @@ export default function SearchAppBar() {
           >
             <HamburgerMenu />
           </IconButton>
+          
           <Typography className={classes.title} variant="h6" noWrap>
             Mercury
           </Typography>
+
+          
+          <Badge color="secondary" badgeContent={1}>
+          <NotificationsNoneIcon />
+          </Badge>
+         
+         
+          <ShareIcon />
+          
+         
+
+
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
+             
             </div>
             <InputBase
               placeholder="Search…"
