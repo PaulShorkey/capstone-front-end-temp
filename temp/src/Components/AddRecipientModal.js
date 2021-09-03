@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function AddGroupModal(props) {
+export default function AddRecipientModal(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
@@ -97,7 +97,7 @@ export default function AddGroupModal(props) {
       >
         <Fade in={open}>
           <div className={classes.paper}>
-          <h2 id="transition-modal-title">Add New Group</h2>
+          <h2 id="transition-modal-title">Create Group</h2>
           <form className={classes.root} noValidate autoComplete="off">
             <TextField id="add-group-name-input" label="Group Name" variant="filled" />
             <TextField id="add-group-description-input" label="Group Description" variant="filled" />

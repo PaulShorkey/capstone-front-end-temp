@@ -24,15 +24,18 @@ function App(props) {
       userData : userData[0]
     });
    
-    props.history.push('/');
+    props.history.push('/Home');
   }
   // ************************************************* END CALLBACK FUNCTIONS ************************************************ //
   if (appData.loggedIn) {
     return (
       <Router>
         <Switch>
-          <Route path="/">
+          <Route path="/Home">
             <Home />
+          </Route>
+          <Route path="/">
+            <Redirect to="/Home"></Redirect>
           </Route>
         </Switch>
       </Router>

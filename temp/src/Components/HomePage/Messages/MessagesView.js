@@ -29,7 +29,7 @@ const useStyles = makeStyles({
     }
   });
   
-export default function GroupTitle (){
+export default function GroupTitle (props){
     const classes = useStyles();
     //State for loggedIn user
 
@@ -51,7 +51,7 @@ export default function GroupTitle (){
     return (
        <div>
            <Grid container  direction="column" >
-              <GroupTitleModal/>
+              <GroupTitleModal groupData={props.groupData}/>
            </Grid>         
             <Grid item xs={9}>
                 <List className={classes.messageArea}>
