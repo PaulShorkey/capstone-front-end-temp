@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function AddGroupModal(props) {
+export default function AddRecipientModal(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 

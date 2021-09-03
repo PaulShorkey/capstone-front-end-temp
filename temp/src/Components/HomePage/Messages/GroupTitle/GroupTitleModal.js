@@ -18,6 +18,9 @@ import DraftsIcon from '@material-ui/icons/Drafts';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import RemoveIcon from '@material-ui/icons/Remove';
+import { useState, useEffect } from 'react';
+import { API_DIRECTORY } from '../../../../constants';
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -31,6 +34,10 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     },
+    form: {
+      width: '100%', // Fix IE 11 issue.
+      marginTop: theme.spacing(1),
+    },
     root: {
       '& > *': {
         margin: theme.spacing(1),
@@ -42,26 +49,169 @@ const useStyles = makeStyles((theme) => ({
       }
   }));
 
-export default function GroupTitleModal() {
+export default function GroupTitleModal(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [addingRecipient, setAddingRecipient] = useState(false);
+  const [languageData, setLanguageData] = useState([]);
+
+  useEffect(() => {
+    if (languageData.length < 1) {
+
+    }
+    
+    const headers = { 'Content-Type': 'application/json' };
+
+    fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.LANGUAGES_TABLE_PATH}`, {
+      method: 'GET',
+      mode: 'cors',
+      headers
+    })
+      .then((result) => {
+        console.log(result);
+      })
+  }, []);
 
   const handleOpen = () => {
-    setOpen(true);
+    if (!isEmptyObject(props.groupData)) {
+      setOpen(true);
+      //setAddingRecipient(!addingRecipient);
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
+    setAddingRecipient(false);
   };
 
+  function isEmptyObject(obj) {
+    return JSON.stringify(obj) === '{}';
+  }
+
+  // ************************************************** RENDER FUNCTIONS *************************************************** //
+  let renderTopDropDown = () => {
+    console.log(props.groupData);
+
+    if (isEmptyObject(props.groupData)) {
+      return (
+        <Grid item xs={3} button onClick={handleOpen}>
+          <ListItem alignItems='flex-start'>
+            <ListItemText >No Group Selected</ListItemText>
+            <ListItemIcon><KeyboardArrowDownIcon /></ListItemIcon>
+          </ListItem>
+        </Grid>
+      );
+    } else {
+      return (
+        <Grid item xs={3} button onClick={handleOpen}>
+          <ListItem alignItems='flex-start'>
+            <ListItemText >{props.groupData.name}</ListItemText>
+            <ListItemIcon><KeyboardArrowDownIcon /></ListItemIcon>
+          </ListItem>
+        </Grid>
+      );
+    }
+  }
+
+  let renderAddRecipientFields = () => {
+    return (
+      <form className={classes.form} noValidate>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="first-name"
+          label="First Name"
+          name="first-name"
+          autoComplete="first name"
+          autoFocus
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="last-name"
+          label="Last Name"
+          name="last-name"
+          autoComplete="last name"
+          autoFocus
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="phone-number"
+          label="Phone Number"
+          name="phone-number"
+          autoComplete="phone number"
+          autoFocus
+        />
+        <form>
+          <label for="language">Language:</label>
+          <select name="language" id="language">
+            <option value="english">English</option>
+            <option value="french">French</option>
+            <option value="desert-speak">Desert-Speak</option>
+          </select>
+
+        </form>
+      </form>
+    );
+  }
+
+  let renderGroupData = () => {
+    return (
+      <Fade in={open}>
+        <div className={classes.paper}>
+          <h2 id="transition-modal-title">Group 1</h2>
+          <div className={classes.p}>
+            <p>{`Number of Users: `}</p>
+            <p>{`Created: ${props.groupData.time_made}`}</p>
+            <p>{`Description: ${props.groupData.description}`}</p>
+          </div>
+          <Divider />
+          <List component="nav" aria-label="main mailbox folders">
+            <ListItem button key='Add Recipient' onClick={ () => {setAddingRecipient(!addingRecipient)} }>
+              <ListItemText 
+                primary='Add Recipient'/>
+              <ListItemIcon> 
+                {
+                  addingRecipient ?
+                  <RemoveIcon /> :
+                  <AddIcon />
+                }
+              </ListItemIcon>
+            </ListItem>
+            {
+              addingRecipient ?
+              renderAddRecipientFields() :
+              <div></div>
+            }
+            <Divider />
+            <ListItem>
+              <ListItemText primary="Select All" />
+            </ListItem>
+            <List component="nav" aria-label="secondary mailbox folders">
+              {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
+                <ListItem button key={text}>
+                  <ListItemText primary={text} />
+                  <ListItemIcon> <EditIcon /> </ListItemIcon>
+                  <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+                </ListItem>
+              ))}
+            </List>
+          </List>
+        </div>
+      </Fade>
+    );
+  }
+  // ************************************************ END RENDER FUNCTIONS ************************************************* //
   return (
     <div>
-      <Grid item xs={3}  button onClick={handleOpen}>
-          <ListItem alignItems='flex-start'>
-                <ListItemText >Group 1</ListItemText>
-                <ListItemIcon><KeyboardArrowDownIcon/></ListItemIcon>
-          </ListItem>
-      </Grid>
+      {renderTopDropDown()}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -74,35 +224,7 @@ export default function GroupTitleModal() {
           timeout: 500,
         }}
       >
-        <Fade in={open}>
-          <div className={classes.paper}>
-          <h2 id="transition-modal-title">Group 1</h2>
-          <div className={classes.p}>
-            <p>Number of Users:12</p>
-            <p>Created: 8-31-2021</p>
-            <p>Description: Vetted Interpreters</p>
-          </div>
-          <Divider/>
-          <List component="nav" aria-label="main mailbox folders">
-          <ListItem>
-            <ListItemText primary="Add Recipients" />
-            </ListItem>
-      <Divider />
-            <ListItem>
-            <ListItemText primary="Select All" />
-            </ListItem>
-          <List component="nav" aria-label="secondary mailbox folders">
-            {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-              <ListItemIcon> <EditIcon/> </ListItemIcon>
-              <ListItemIcon> <DeleteForeverIcon/> </ListItemIcon>            
-          </ListItem>
-            ))}
-      </List>
-      </List> 
-          </div>
-        </Fade>
+        {renderGroupData()}
       </Modal>
     </div>
   );

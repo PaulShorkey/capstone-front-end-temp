@@ -15,9 +15,8 @@ import Container from '@material-ui/core/Container';
 import { red } from '@material-ui/core/colors';
 import { borders } from '@material-ui/system';
 import { useHistory } from "react-router-dom";
-
-const API_DIRECTORY = "http://localhost:3001";
-const LOGIN_PATH = `/login`;
+import { useState } from 'react';
+import { API_DIRECTORY } from '../../constants';
 
 function Copyright() {
   return (
@@ -63,7 +62,9 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn(props) {
   const classes = useStyles();
 
-  console.log(props.history);
+  const [error, setError] = useState({status: false, message: 'No Error'});
+  const [loginFailed, setLoginFailed] = useState(false);
+
   let handleSubmitClick = (event) => {
     event.preventDefault();
 
@@ -80,7 +81,7 @@ export default function SignIn(props) {
     } else {
       const headers = { 'Content-Type': 'application/json' };
 
-      fetch(`${API_DIRECTORY}${LOGIN_PATH}`, {
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.LOGIN_PATH}`, {
         method: 'POST',
         mode: 'cors',
         headers,
@@ -91,16 +92,27 @@ export default function SignIn(props) {
       })
         .then((result) => {
           if (result.status === 200) {
-            console.log('Good login credentials');
             result = result.json()
               .then((result) => {
                 props.handleLogin(result);
-               // props.history.push("/Home", {loggedIn:true})
               })
-          } else {
-            console.log('Bad login credentials');
+          } 
+          else if (result.status === 404) {
+            setLoginFailed(true);
           }
-        })
+          else {
+            setError({
+              status: true,
+              errorMessage: 'Email and Password do not match records'
+            })
+          }
+        },
+        (error) => {
+          setError({
+            status: true,
+            errorMessage: 'Unable to connect to database'
+          })
+        });
     }
   }
 

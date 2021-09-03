@@ -8,7 +8,7 @@ import AppBar from './AppBar/AppBar.js'
 import GroupSelector from './GroupSelector/GroupSelector.js';
 import MessagesView from './Messages/MessagesView.js'
 import NewMessage from './Messages/NewMessage.js'
-
+import { useState } from 'react';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home(){
-
+  const [groupData, setGroupData] = useState({});
   // //State for loggedIn user
   // const [activeUser, setActiveUser]= useState('');
 
@@ -34,9 +34,12 @@ export default function Home(){
   // const [messages, setMessages] = useState([]);
   // const [activeGroup, setActiveGroup]= useState('');
 
-
-  
-
+  // ************************************************** CALLBACKS ******************************************************* //
+  let updateGroupTitleModal = (data) => {
+    console.log('working : ', data);
+    setGroupData(data);
+  }
+  // *********************************************** END CALLBACKS ******************************************************* //
 
   const classes = useStyles();
 
@@ -50,10 +53,10 @@ export default function Home(){
           <Grid item md={10}>
             <Grid container >
               <Grid key='GroupSelector' item className={classes.groupSelector}>
-                <GroupSelector/>
+                <GroupSelector updateGroupTitleModal={updateGroupTitleModal}/>
               </Grid>
               <Grid key='MessagesView' item className={classes.messagesView}>
-                <MessagesView/>
+                <MessagesView groupData={groupData}/>
               </Grid>
             </Grid>
           </Grid>
