@@ -64,6 +64,7 @@ export default function GroupTitleModal(props) {
   const [commMethodsLoaded, setCommMethodsLoaded] = useState(false);
   const [recipientsData, setRecipientsData] = useState([]);
   const [recipientsDataLoaded, setRecipientsDataLoaded] = useState(false);
+  const [numberOfRecipientsInGroup, setNumberOfRecipientsInGroup] = useState(0);
 
   const [error, setError] = useState({status: false, message: 'No Error'});
 
@@ -81,7 +82,6 @@ export default function GroupTitleModal(props) {
           if (result.status === 200) {
             result = result.json()
               .then((result) => {
-                console.log(result);
                 setLanguageData(result);
                 setLanguageDataLoaded(true);
               })
@@ -126,35 +126,36 @@ export default function GroupTitleModal(props) {
   }
 
   let fetchRecipientsData = () => {
-    if (recipientsData.length < 1) {
-      const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json' };
 
-      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_GET_PATH}/${props.groupData.group_id}`, {
-        method: 'GET',
-        mode: 'cors',
-        headers
-      })
-        .then((result) => {
-          if (result.status === 200) {
-            result = result.json()
-              .then((result) => {
-                setRecipientsData(result);
-                setRecipientsDataLoaded(true);
-              })
-          }
-          else if (result.status === 404) {
-            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_404} @ RecipientsData` })
-            setRecipientsDataLoaded(true);
-          } else {
-            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
-            setRecipientsDataLoaded(true);
-          }
-        },
-          (error) => {
-            setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
-            setRecipientsDataLoaded(true);
-          });
-    }
+    fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_IN_GROUP_PATH}/${props.groupData.group_id}`, {
+      method: 'GET',
+      mode: 'cors',
+      headers
+    })
+      .then((result) => {
+        if (result.status === 200) {
+          result = result.json()
+            .then((result) => {
+              setRecipientsData(result);
+              setRecipientsDataLoaded(true);
+              setNumberOfRecipientsInGroup(result.length);
+            })
+        }
+        else if (result.status === 404) {
+          setError({ status: true, message: `${ERROR_MESSAGES.ERROR_404} @ RecipientsData` })
+          setRecipientsDataLoaded(true);
+          setRecipientsData([]);
+        } else {
+          setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
+          setRecipientsDataLoaded(true);
+        }
+      },
+        (error) => {
+          setError({ status: true, message: `${ERROR_MESSAGES.ERROR_UNKNOWN} @ Recipients Data` })
+          setRecipientsDataLoaded(true);
+        });
+
   }
   // ************************************************* END FETCH FUNCTIONS ************************************************** //
   useEffect(() => {
@@ -166,6 +167,7 @@ export default function GroupTitleModal(props) {
   const handleOpen = () => {
     if (!isEmptyObject(props.groupData)) {
       setOpen(true);
+      fetchRecipientsData();
       //setAddingRecipient(!addingRecipient);
     }
   };
@@ -173,6 +175,7 @@ export default function GroupTitleModal(props) {
   const handleClose = () => {
     setOpen(false);
     setAddingRecipient(false);
+    setRecipientsData([]);
   };
 
   function isEmptyObject(obj) {
@@ -181,7 +184,7 @@ export default function GroupTitleModal(props) {
 
   // ************************************************** RENDER FUNCTIONS *************************************************** //
   let renderTopDropDown = () => {
-    console.log(props.groupData);
+    console.log('PROPS GROUP DATA : ', props.groupData);
 
     if (isEmptyObject(props.groupData)) {
       return (
@@ -270,8 +273,6 @@ export default function GroupTitleModal(props) {
     let language = document.getElementById('language-drop-down').value;
     let commMethod = document.getElementById('comm-methods-drop-down').value;
 
-    console.log(language);
-    console.log(commMethod);
     let errorMessage = '';
 
     if (firstName === undefined || typeof firstName !== 'string' || firstName === '') errorMessage += 'Please Provide a Value for First Name\n';
@@ -285,7 +286,7 @@ export default function GroupTitleModal(props) {
     } else {
       const headers = { 'Content-Type': 'application/json' };
 
-      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_POST_PATH}`, {
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_TO_GROUP_POST_PATH}/${props.groupData.group_id}`, {
         method: 'POST',
         mode: 'cors',
         headers,
@@ -298,13 +299,21 @@ export default function GroupTitleModal(props) {
         })
           
           })
-          .then((result) => {
-            if (result.status === 200) {
-              console.log('SUCCESS');
-            } else {
-              console.log("FAILURE");
-            }
-      })
+        .then((result) => {
+          if (result.status === 200) {
+            result = result.json()
+              .then((result) => {
+                console.log('SUCCESS ', result[0]);
+                let data = recipientsData;
+                data.push(result[0]);
+                setRecipientsData(data);
+                setAddingRecipient(!addingRecipient);
+                setNumberOfRecipientsInGroup(data.length);
+              })
+          } else {
+            console.log(`FAILURE : ${result.status}`);
+          }
+        })
     }
   }
 
@@ -354,26 +363,41 @@ export default function GroupTitleModal(props) {
   }
 
   let renderRecipients = () => {
-    return (
-      <List component="nav" aria-label="secondary mailbox folders">
-        {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemText primary={text} />
-            <ListItemIcon> <EditIcon /> </ListItemIcon>
-            <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
-          </ListItem>
-        ))}
-      </List>
-    );
+    if (recipientsDataLoaded) {
+      return (
+        <List component="nav" aria-label="secondary mailbox folders">
+          {recipientsData.map((element, index) => (
+            <ListItem button key={element.recipient_id}>
+              <ListItemText primary={`${element.first_name} ${element.last_name}`} />
+              <ListItemIcon> <EditIcon /> </ListItemIcon>
+              <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+            </ListItem>
+          ))}
+        </List>
+      );
+    } else {
+      return (
+        <List component="nav" aria-label="secondary mailbox folders">
+          {['Bob Schmeckly', 'Bill Smith', 'Bo Schmo'].map((text, index) => (
+            <ListItem button key={text}>
+              <ListItemText primary={text} />
+              <ListItemIcon> <EditIcon /> </ListItemIcon>
+              <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+            </ListItem>
+          ))}
+        </List>
+      );
+    }
+    
   }
 
   let renderGroupData = () => {
     return (
       <Fade in={open}>
         <div className={classes.paper}>
-          <h2 id="transition-modal-title">Group 1</h2>
+          <h2 id="transition-modal-title">{`${props.groupData.name}`}</h2>
           <div className={classes.p}>
-            <p>{`Number of Users: `}</p>
+            <p>{`Number of Users: ${numberOfRecipientsInGroup}`}</p>
             <p>{`Created: ${props.groupData.time_made}`}</p>
             <p>{`Description: ${props.groupData.description}`}</p>
           </div>

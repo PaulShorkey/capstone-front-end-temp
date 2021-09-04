@@ -5,7 +5,8 @@ const API_DIRECTORY = {
     LANGUAGES_TABLE_PATH : '/languages',
     PROVIDER_CAPABILITIES_TABLE_PATH : '/provider_capabilities',
     RECIPIENTS_POST_PATH : '/recipients',
-    RECIPIENTS_GET_PATH : '/recipients'
+    RECIPIENTS_TO_GROUP_POST_PATH : '/recipients/withGroupID',
+    RECIPIENTS_IN_GROUP_PATH : '/recipients/id'
 };
 
 const ERROR_MESSAGES = {
