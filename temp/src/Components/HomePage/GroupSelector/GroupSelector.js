@@ -45,11 +45,12 @@ export default function GroupSelector(props) {
       headers
     })
       .then((result) => {
+        console.log('RESULT', result);
         if (result.status === 200) {
           result = result.json()
             .then((result) => {
-              console.log(result);
-              setGroupData(result);
+              console.log('JSONd RESULT ', result);
+              setGroupData(result.data);
               setDataLoaded(true);
 
             })

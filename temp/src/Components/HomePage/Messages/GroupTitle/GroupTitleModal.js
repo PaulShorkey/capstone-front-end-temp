@@ -21,7 +21,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import RemoveIcon from '@material-ui/icons/Remove';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import { useState, useEffect } from 'react';
-import { API_DIRECTORY, ERROR_MESSAGES } from '../../../../constants';
+import { API_DIRECTORY, ERROR_MESSAGES, ERROR_TYPES } from '../../../../constants';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -66,7 +66,7 @@ export default function GroupTitleModal(props) {
   const [recipientsDataLoaded, setRecipientsDataLoaded] = useState(false);
   const [numberOfRecipientsInGroup, setNumberOfRecipientsInGroup] = useState(0);
 
-  const [error, setError] = useState({status: false, message: 'No Error'});
+  const [error, setError] = useState({status: false, type: 'message', message: 'No Error'});
 
   // *************************************************** FETCH FUNCTIONS **************************************************** //
   let fetchLanguageData = () => {
@@ -88,7 +88,7 @@ export default function GroupTitleModal(props) {
           }
         },
           (error) => {
-            setError({ status: true, message: ERROR_MESSAGES.ERROR_UNKNOWN })
+            setError({ status: true, type: ERROR_TYPES.FATAL, message: ERROR_MESSAGES.ERROR_UNKNOWN })
           });
     }
   }
@@ -106,7 +106,7 @@ export default function GroupTitleModal(props) {
           if (result.status === 200) {
             result = result.json()
               .then((result) => {
-                setCommMethods(result);
+                setCommMethods(result.data);
                 setCommMethodsLoaded(true);
               })
           }
@@ -168,7 +168,6 @@ export default function GroupTitleModal(props) {
     if (!isEmptyObject(props.groupData)) {
       setOpen(true);
       fetchRecipientsData();
-      //setAddingRecipient(!addingRecipient);
     }
   };
 
@@ -184,8 +183,6 @@ export default function GroupTitleModal(props) {
 
   // ************************************************** RENDER FUNCTIONS *************************************************** //
   let renderTopDropDown = () => {
-    console.log('PROPS GROUP DATA : ', props.groupData);
-
     if (isEmptyObject(props.groupData)) {
       return (
         <Grid item xs={3} button onClick={handleOpen}>
@@ -209,6 +206,10 @@ export default function GroupTitleModal(props) {
 
   let renderLanguagesDropDownMenu = () => {
     if (languageDataLoaded) {
+      if (!Array.isArray(languageData)) {
+        setLanguageData([]);
+      }
+
       return (
         <form>
           <label for="language">Language:</label>
@@ -239,6 +240,10 @@ export default function GroupTitleModal(props) {
 
   let renderCommMethodsDropdown = () => {
     if (commMethodsLoaded) {
+      if (!Array.isArray(commMethods)) {
+        setCommMethods([]);
+      }
+
       return (
         <form>
           <label for="comm-methods">Comm Method:</label>
@@ -303,7 +308,6 @@ export default function GroupTitleModal(props) {
           if (result.status === 200) {
             result = result.json()
               .then((result) => {
-                console.log('SUCCESS ', result[0]);
                 let data = recipientsData;
                 data.push(result[0]);
                 setRecipientsData(data);
@@ -311,7 +315,7 @@ export default function GroupTitleModal(props) {
                 setNumberOfRecipientsInGroup(data.length);
               })
           } else {
-            console.log(`FAILURE : ${result.status}`);
+            setError({status: true, type: ERROR_TYPES.NON_FATAL, message: ERROR_MESSAGES.ERROR_500})
           }
         })
     }

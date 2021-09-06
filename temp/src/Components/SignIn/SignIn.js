@@ -12,9 +12,6 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { red } from '@material-ui/core/colors';
-import { borders } from '@material-ui/system';
-import { useHistory } from "react-router-dom";
 import { useState } from 'react';
 import { API_DIRECTORY } from '../../constants';
 
