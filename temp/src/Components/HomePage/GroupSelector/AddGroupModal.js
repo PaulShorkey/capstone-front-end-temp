@@ -66,7 +66,8 @@ export default function AddGroupModal(props) {
         })
       })
         .then((result) => {
-          if (result.status === 200) {
+          console.log('GROUP RESULT ', result);
+          if (result.status === 201) {
             console.log('Group Added');
             props.handleGroupAdded();
             setOpen(false);

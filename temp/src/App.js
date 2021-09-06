@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Redirect, Switch, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 /// FILE IMPORTS ///
 import SignIn from './Components/SignIn/SignIn.js'
@@ -14,7 +14,7 @@ function App(props) {
   });
   useEffect( () => {
       console.log('effecting');
-  }, appData)
+  }, [])
   
   // **************************************************** CALLBACK FUNCTIONS ************************************************* //
   let handleLogin = (userData) => {
