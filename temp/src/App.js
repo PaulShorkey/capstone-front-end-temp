@@ -32,7 +32,7 @@ function App(props) {
       <Router>
         <Switch>
           <Route path="/Home">
-            <Home />
+            <Home appData={appData}/>
           </Route>
           <Route path="/">
             <Redirect to="/Home"></Redirect>

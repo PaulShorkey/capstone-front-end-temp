@@ -1,13 +1,20 @@
 const API_DIRECTORY = {
-    URL : "http://localhost:3030",
+    URL : "http://localhost:8080",
     LOGIN_PATH : `/login`,
     GROUPS_TABLE_PATH : '/groups',
     LANGUAGES_TABLE_PATH : '/languages',
     PROVIDER_CAPABILITIES_TABLE_PATH : '/provider-capabilities',
     RECIPIENTS_POST_PATH : '/recipients',
     RECIPIENTS_TO_GROUP_POST_PATH : '/recipients/withGroupID',
-    RECIPIENTS_IN_GROUP_PATH : '/recipients/id'
+    RECIPIENTS_IN_GROUP_PATH : '/recipients/withGroupID',
+    SEND_MESSAGES_MANY_PATH : '/send-messages/many',
+    GET_MESSAGES_BY_GROUP_PATH : '/sent-messages/withGroupID'
 };
+
+const SIGNAL_API ={
+    SEND_ONE_URL : "https://ec2-54-177-132-229.us-west-1.compute.amazonaws.com/api",
+    SEND_MANY_URL : "https://ec2-54-177-132-229.us-west-1.compute.amazonaws.com/api/batch/"
+}
 
 const ERROR_MESSAGES = {
     ERROR_404 : "Error : 404",
@@ -23,4 +30,4 @@ const ERROR_TYPES = {
     MESSAGE : "message"
 }
 
-export { API_DIRECTORY, ERROR_MESSAGES, ERROR_TYPES };
+export { API_DIRECTORY, ERROR_MESSAGES, ERROR_TYPES, SIGNAL_API };

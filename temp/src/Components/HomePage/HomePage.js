@@ -9,6 +9,7 @@ import GroupSelector from './GroupSelector/GroupSelector.js';
 import MessagesView from './Messages/MessagesView.js'
 import NewMessage from './Messages/NewMessage.js'
 import { useState } from 'react';
+import { getThemeProps } from '@material-ui/styles';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -25,13 +26,20 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Home(){
+export default function Home(props){
   const [groupData, setGroupData] = useState({});
+  const [messagesNeedUpdating, setMessagesNeedUpdating] = useState(false);
 
   // ************************************************** CALLBACKS ******************************************************* //
   let updateGroupTitleModal = (data) => {
     console.log('working : ', data);
     setGroupData(data);
+    setMessagesNeedUpdating(true);
+  }
+
+  let updateMessageViewComponent = () => {
+    console.log('calling');
+    setMessagesNeedUpdating(false);
   }
   // *********************************************** END CALLBACKS ******************************************************* //
 
@@ -50,7 +58,7 @@ export default function Home(){
                 <GroupSelector updateGroupTitleModal={updateGroupTitleModal}/>
               </Grid>
               <Grid key='MessagesView' item className={classes.messagesView}>
-                <MessagesView groupData={groupData}/>
+                <MessagesView appData={props.appData} groupData={groupData} messagesNeedUpdating={messagesNeedUpdating} updateMessageViewComponent={updateMessageViewComponent}/>
               </Grid>
             </Grid>
           </Grid>
