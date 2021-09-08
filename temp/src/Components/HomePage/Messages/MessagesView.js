@@ -93,7 +93,6 @@ export default function GroupTitle (props){
                     })
                       .then(res => res.json())
                       .then((result) => {
-                        console.log(result[0].username);
                         item.sender = result[0].username;
                       })
                   )
@@ -118,12 +117,10 @@ export default function GroupTitle (props){
   let renderMessageData = () => {
     // conditions should be met for this when clicking a new group or adding a message to the current one
     if (props.messagesNeedUpdating && !isEmptyObject(props.groupData)) {
-      console.log('fetchGroupMessageData()')
       fetchGroupMessageData();
     }
 
     if (messageDataLoaded) {
-      console.log('messages in renderMessageData', messages);
       return (
         <List className={classes.messageArea}>
           {messages.map((message, index) => (
@@ -141,7 +138,6 @@ export default function GroupTitle (props){
         </List>
       )
     } else {
-      console.log('messages in latter half of renderMessageData', messages);
       return (
         
         <List className={classes.messageArea}>
@@ -195,7 +191,6 @@ export default function GroupTitle (props){
             } else {
               result = result.json()
                 .then((result) => {
-                  console.log('result ', result);
                   setRecipientData(result);
                   recipients = result;
                 })

@@ -32,13 +32,11 @@ export default function Home(props){
 
   // ************************************************** CALLBACKS ******************************************************* //
   let updateGroupTitleModal = (data) => {
-    console.log('working : ', data);
     setGroupData(data);
     setMessagesNeedUpdating(true);
   }
 
   let updateMessageViewComponent = (value) => {
-    console.log('calling');
     setMessagesNeedUpdating(value);
   }
   // *********************************************** END CALLBACKS ******************************************************* //
