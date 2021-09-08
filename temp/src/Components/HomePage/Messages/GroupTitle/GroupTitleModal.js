@@ -15,13 +15,14 @@ import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DeleteForeverOutlinedIcon from '@material-ui/icons/DeleteForeverOutlined';
 import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import RemoveIcon from '@material-ui/icons/Remove';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import { useState, useEffect } from 'react';
 import { API_DIRECTORY, ERROR_MESSAGES, ERROR_TYPES } from '../../../../constants';
+import {editRecipient,deleteRecipient} from './GroupTitleModalHelper';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +30,11 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      overflow:'hidden'
+    },
+    content: {
+      padding: 12,
+      overflow: 'scroll'
     },
     paper: {
       backgroundColor: theme.palette.background.paper,
@@ -44,6 +50,8 @@ const useStyles = makeStyles((theme) => ({
     '& > *': {
       margin: theme.spacing(1),
       width: '25ch',
+      maxWidth: 280,
+      //backgroundColor: theme.palette.background.paper
     },
     submit: {
       margin: theme.spacing(3, 0, 2),
@@ -51,7 +59,21 @@ const useStyles = makeStyles((theme) => ({
   },
   p: {
         fontSize: 12
-      }
+      },
+  editButton: {
+      margin: theme.spacing(1),
+      display: "flex",
+      flexFlow: 'row nowrap',
+      justifyContent: 'center',
+      borderRadius: '1.em'
+      },
+  deleteButton: {
+      margin: theme.spacing(1),
+      display: "flex",
+      flexFlow: 'row nowrap',
+      justifyContent: 'center',
+      borderRadius: '1.em'     
+        },
   }));
 
 export default function GroupTitleModal(props) {
@@ -180,6 +202,11 @@ export default function GroupTitleModal(props) {
 
   function isEmptyObject(obj) {
     return JSON.stringify(obj) === '{}';
+  }
+  
+  const editRecipientHanlder = (event) => {
+    console.log('edit recipient has been clicked', event );
+    
   }
 
   // ************************************************** RENDER FUNCTIONS *************************************************** //
@@ -370,12 +397,27 @@ export default function GroupTitleModal(props) {
   let renderRecipients = () => {
     if (recipientsDataLoaded) {
       return (
-        <List component="nav" aria-label="secondary mailbox folders">
+        <List className={classes.content} component="nav" aria-label="secondary mailbox folders">
           {recipientsData.map((element, index) => (
-            <ListItem button key={element.recipient_id}>
+            <ListItem key={element.recipient_id}>
               <ListItemText primary={`${element.first_name} ${element.last_name}`} />
-              <ListItemIcon> <EditIcon /> </ListItemIcon>
-              <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+              <Button
+                //variant= "outlined"
+                // color="primary"
+                background-color= 'Transparent'
+                className={classes.editButton}
+                onClick={editRecipient}
+                endIcon={<EditIcon background-color='Transparent' variant='outlined' color='secondary'/>}
+                >
+              </Button>
+              <Button
+                //variant= "outlined"
+                color="red"
+                className={classes.deleteButton}
+                onClick={deleteRecipient}
+                endIcon={<DeleteForeverOutlinedIcon/>}
+                >
+              </Button>
             </ListItem>
           ))}
         </List>
@@ -387,7 +429,7 @@ export default function GroupTitleModal(props) {
             <ListItem button key={text}>
               <ListItemText primary={text} />
               <ListItemIcon> <EditIcon /> </ListItemIcon>
-              <ListItemIcon> <DeleteForeverIcon /> </ListItemIcon>
+              <ListItemIcon> <DeleteForeverOutlinedIcon /> </ListItemIcon>
             </ListItem>
           ))}
         </List>
@@ -439,6 +481,7 @@ export default function GroupTitleModal(props) {
     <div>
       {renderTopDropDown()}
       <Modal
+        overflow='scroll'
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}

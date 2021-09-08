@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -8,7 +8,6 @@ import AppBar from './AppBar/AppBar.js'
 import GroupSelector from './GroupSelector/GroupSelector.js';
 import MessagesView from './Messages/MessagesView.js'
 import NewMessage from './Messages/NewMessage.js'
-import { useState } from 'react';
 import { getThemeProps } from '@material-ui/styles';
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,6 +28,25 @@ const useStyles = makeStyles((theme) => ({
 export default function Home(props){
   const [groupData, setGroupData] = useState({});
   const [messagesNeedUpdating, setMessagesNeedUpdating] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
+
+
+
+ // ***********SETS WINDOW RESPONSIVENES *************************//
+ useEffect(() => {
+  const setResponsiveness = () => {
+    return window.innerWidth < 1280
+      ? setIsMobileView(true)
+      : setIsMobileView(false);
+  };
+
+  setResponsiveness();
+  window.addEventListener("resize", () => setResponsiveness());
+
+  return () => {
+    window.removeEventListener("resize", () => setResponsiveness());
+  }
+}, []);
 
   // ************************************************** CALLBACKS ******************************************************* //
   let updateGroupTitleModal = (data) => {
