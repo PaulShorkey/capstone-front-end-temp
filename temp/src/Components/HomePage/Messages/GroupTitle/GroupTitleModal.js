@@ -159,6 +159,7 @@ export default function GroupTitleModal(props) {
   }
   // ************************************************* END FETCH FUNCTIONS ************************************************** //
   useEffect(() => {
+    console.log('group title modal useeffect');
     fetchLanguageData();
     fetchCommMethodsData();
     fetchRecipientsData();

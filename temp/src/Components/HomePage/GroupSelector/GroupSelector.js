@@ -37,6 +37,7 @@ export default function GroupSelector(props) {
   const [groups, setGroups] = React.useState([]);
 
   let fetchGroupData = () => {
+    console.log('fetching group data');
     const headers = { 'Content-Type': 'application/json' };
 
     fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GROUPS_TABLE_PATH}`, {

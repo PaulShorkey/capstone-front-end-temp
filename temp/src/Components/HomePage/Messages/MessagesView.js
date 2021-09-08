@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
@@ -9,9 +9,18 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Fab from '@material-ui/core/Fab';
 import SendIcon from '@material-ui/icons/Send';
-
-/// FILE IMPORTS ///
+import { API_DIRECTORY, SIGNAL_API } from '../../../constants.js';
+import https from 'https'
 import GroupTitleModal from './GroupTitle/GroupTitleModal.js'
+/// FILE IMPORTS ///
+
+const agent = new https.Agent({
+  rejectUnauthorized: false
+})
+
+function isEmptyObject(obj) {
+  return JSON.stringify(obj) === '{}';
+}
 
 const useStyles = makeStyles({
     table: {
@@ -29,15 +38,126 @@ const useStyles = makeStyles({
     }
   });
   
+
+
 export default function GroupTitle (props){
     const classes = useStyles();
     //State for loggedIn user
 
   //State for messages list in view
   const [messages, setMessages] = useState([]);
+  const [messageValue, setMessageValue]= useState('')
+  const [recipientData, setRecipientData] = useState([]);
+  const [messageDataLoaded, setMessageDataLoaded] = useState(false);
+  const [, updateState] = useState();
+  const forcedUpdate = useCallback(() => updateState({}), []);
 
-   const [messageValue, setMessageValue]= useState('')
+  let recipients = [];
+  let messageArray = [];
 
+  //polling for latest messages
+  useEffect(() => {
+    
+  }, [messages])
+
+  // ************************************************************** FETCH FUNCTIONS ******************************************************* //
+  let fetchRecipientData = () => {
+    
+  }
+
+  let fetchGroupMessageData = () => {
+    const headers = { 'Content-Type': 'application/json' };
+
+    if (props.groupData !== undefined) {
+      fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GET_MESSAGES_BY_GROUP_PATH}/${props.groupData.group_id}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers
+      })
+        .then((result) => {
+          if (result.status === 200) {
+            result = result.json()
+              .then((result) => {
+                messageArray = [];
+                for (let i = 0; i < result.length; i++) {
+                  messageArray.push({ 'content': result[i].content, 'time': result[i].time_made, 'sender': result[i].sender_id });
+                }
+                
+                let promises = (messageArray.map(item => {
+                  return (
+
+                    fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GET_MERCURY_USER_BY_ID}/${item.sender}`, {
+                      method: 'GET',
+                      mode: 'cors',
+                      headers
+                    })
+                      .then(res => res.json())
+                      .then((result) => {
+                        item.sender = result[0].username;
+                      })
+                  )
+                }))
+
+                Promise.all(promises)
+                  .then(() => {
+                    setMessages(messageArray);
+                    setMessageDataLoaded(true);
+                    props.updateMessageViewComponent(false);
+                    forcedUpdate();
+                  })
+              })
+          }
+        })
+    } else {
+      setMessages([]);
+    }
+  }
+  // ************************************************************ END FETCH FUNCTIONS ***************************************************** //
+  // ************************************************************** RENDER FUNCTIONS ******************************************************* //
+  let renderMessageData = () => {
+    // conditions should be met for this when clicking a new group or adding a message to the current one
+    if (props.messagesNeedUpdating && !isEmptyObject(props.groupData)) {
+      fetchGroupMessageData();
+    }
+
+    if (messageDataLoaded) {
+      return (
+        <List className={classes.messageArea}>
+          {messages.map((message, index) => (
+            <ListItem key={index}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <ListItemText align="right" primary={`${message.content}`}></ListItemText>
+                </Grid>
+                <Grid item xs={12}>
+                  <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+        </List>
+      )
+    } else {
+      return (
+        
+        <List className={classes.messageArea}>
+          {messages.map((message, index) => (
+            <ListItem key={index}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <ListItemText align="right" primary={`${message.content}`}></ListItemText>
+                </Grid>
+                <Grid item xs={12}>
+                  <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+        </List>
+      )
+    }
+  }
+  // ************************************************************END RENDER FUNCTIONS ****************************************************** // 
   //Stores changes iin text field as things are typed
   const handleTyping = (event) => {
       setMessageValue(event.target.value)
@@ -45,45 +165,115 @@ export default function GroupTitle (props){
   
   //when send button is clicked, adds item to messages
   const handleSend = () => {
-    setMessages([...messages, {'content':messageValue, 'time':'11:15','sender':'GlLaDOS'}])
+    let message = document.getElementById('message-input').value;
+
+    let errorMessage = '';
+
+    if (message === undefined || typeof message !== 'string' || message === '') errorMessage += 'Please Provide a Value for Message';
+
+    if (errorMessage.length > 0) {
+      alert(errorMessage);
+    } else {
+      if (props.groupData.group_id === undefined) {
+        errorMessage += 'You Must Select a Group to Send a Message to';
+        alert(errorMessage);
+      } else {
+        const headers = { 'Content-Type': 'application/json' };
+
+        fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.RECIPIENTS_TO_GROUP_POST_PATH}/${props.groupData.group_id}`, {
+          method: 'GET',
+          mode: 'cors',
+          headers
+        })
+          .then((result) => {
+            if (result.status !== 200) {
+              console.log('FAILED');
+            } else {
+              result = result.json()
+                .then((result) => {
+                  setRecipientData(result);
+                  recipients = result;
+                })
+                .then(() => {
+                  let packet = [];
+
+                  for (let i = 0; i < recipients.length; i++) {
+                    packet.push({
+                      recipient: `${recipients[i].phone_number}`,
+                      message: message
+                    })
+                  }
+                  let bodyData = JSON.stringify({
+                    recipients: packet
+                  })
+
+                  // THIS IS COMMENTED OUT FOR OFFLINE TESTING, UNCOMMENT IF THIS WASN'T CHANGED
+                  fetch(SIGNAL_API.SEND_MANY_URL, {
+                    agent,
+                    method: 'POST',
+                    mode: 'cors',
+                    headers,
+                    body: bodyData
+                  })
+                    .then((result) => {
+                      if (result.status === 200) {
+                        let recipientIDs = [];
+                        for (let i = 0; i < recipients.length; i++) {
+                          recipientIDs.push(recipients[i].recipient_id)
+                        }
+                        let bodyData = JSON.stringify({
+                          sender_id: props.appData.userData.user_id,
+                          recipient_ids: recipientIDs,
+                          recipient_group_id: props.groupData.group_id,
+                          message: message
+                        })
+
+                        fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.SEND_MESSAGES_MANY_PATH}`, {
+                          method: 'POST',
+                          mode: 'cors',
+                          headers,
+                          body: bodyData
+
+                        })
+                          .then((result) => {
+                            if (result.status === 200) {
+                              // forcers the component to fully reload messages relevant to the current group id
+                              props.updateMessageViewComponent(true);
+                              setMessageDataLoaded(false);
+                              forcedUpdate();
+                            } else {
+                              // error handling to be implemented
+                              console.log('Something bad happened');
+                            }
+                          })
+                      } else {
+
+                      }
+                    })
+                })
+            }
+          })
+      }
+    }
   }
 
-    return (
-       <div>
-           <Grid container  direction="column" >
-              <GroupTitleModal groupData={props.groupData}/>
-           </Grid>         
-            <Grid item xs={9}>
-                <List className={classes.messageArea}>
-                    {messages.map((message, index) => (
-                        <ListItem key={index}>
-                          <Grid container>
-                            <Grid item xs={12}>
-                              <ListItemText align="right" primary={message.content}></ListItemText>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
-                            </Grid>
-                          </Grid>
-                        </ListItem>        
-                    ))}         
-                </List>
-                <Divider />
-                <Grid container style={{padding: '20px'}} align='right'>
-                    <Grid item xs={11} align='right'>
-                        <TextField onChange={handleTyping} value={messageValue} id="outlined-basic-email" label="Type Something" fullWidth />
-                    </Grid>
-                    <Grid xs={1} align='right'>
-                        <Fab color="primary" aria-label="add" onClick={handleSend}><SendIcon /></Fab>
-                    </Grid>
-                </Grid>
-            </Grid>
-        </div>
+  return (
+    <div>
+      <Grid container direction="column" >
+        <GroupTitleModal groupData={props.groupData} />
+      </Grid>
+      <Grid item xs={9}>
+        {renderMessageData()}
+        <Divider />
+        <Grid container style={{ padding: '20px' }} align='right'>
+          <Grid item xs={11} align='right'>
+            <TextField onChange={handleTyping} value={messageValue} id="message-input" label="Type Something" fullWidth />
+          </Grid>
+          <Grid xs={1} align='right'>
+            <Fab color="primary" aria-label="add" onClick={handleSend}><SendIcon /></Fab>
+          </Grid>
+        </Grid>
+      </Grid>
+    </div>
     )
 }
-
-
-
-/**{content:"The British are coming", time:'9:30', sender:"Paul"},
-    {content:"This is Sparta", time:'9:31',sender:"Sparticus"},
-    {content:"Nah fam, its our gold", time:'10:35',sender:"Nixon"} */
