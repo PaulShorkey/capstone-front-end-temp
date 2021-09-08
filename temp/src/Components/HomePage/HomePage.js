@@ -37,9 +37,9 @@ export default function Home(props){
     setMessagesNeedUpdating(true);
   }
 
-  let updateMessageViewComponent = () => {
+  let updateMessageViewComponent = (value) => {
     console.log('calling');
-    setMessagesNeedUpdating(false);
+    setMessagesNeedUpdating(value);
   }
   // *********************************************** END CALLBACKS ******************************************************* //
 

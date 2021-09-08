@@ -8,7 +8,8 @@ const API_DIRECTORY = {
     RECIPIENTS_TO_GROUP_POST_PATH : '/recipients/withGroupID',
     RECIPIENTS_IN_GROUP_PATH : '/recipients/withGroupID',
     SEND_MESSAGES_MANY_PATH : '/send-messages/many',
-    GET_MESSAGES_BY_GROUP_PATH : '/sent-messages/withGroupID'
+    GET_MESSAGES_BY_GROUP_PATH : '/sent-messages/withGroupID',
+    GET_MERCURY_USER_BY_ID : '/mercury-users/withID'
 };
 
 const SIGNAL_API ={

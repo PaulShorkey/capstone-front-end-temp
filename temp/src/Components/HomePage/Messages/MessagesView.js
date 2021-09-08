@@ -66,54 +66,82 @@ export default function GroupTitle (props){
   }
 
   let fetchGroupMessageData = () => {
-    console.log('fetching group message data');
     const headers = { 'Content-Type': 'application/json' };
-  
+
     if (props.groupData !== undefined) {
       fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GET_MESSAGES_BY_GROUP_PATH}/${props.groupData.group_id}`, {
         method: 'GET',
         mode: 'cors',
         headers
       })
-        //setMessages([...messages, {'content':messageValue, 'time':'11:15','sender':'GlLaDOS'}])
         .then((result) => {
-          console.log('here');
           if (result.status === 200) {
             result = result.json()
               .then((result) => {
-                console.log('result : ', result);
                 messageArray = [];
-                for (let i = 0; i < result.length ; i++ ) {
-                  console.log('pushing');
-                  messageArray.push({content: result[i].content, time: result[i].time_made, sender: result[i].sender_id});
-                  setMessages([...messages, { 'content': result[i].content, 'time': result[i].time_made, 'sender': result[i].sender_id }]);
+                for (let i = 0; i < result.length; i++) {
+                  messageArray.push({ 'content': result[i].content, 'time': result[i].time_made, 'sender': result[i].sender_id });
                 }
                 
-                setMessageDataLoaded(true);
-                props.updateMessageViewComponent();
-                forcedUpdate();
-              })
+                let promises = (messageArray.map(item => {
+                  return (
 
+                    fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GET_MERCURY_USER_BY_ID}/${item.sender}`, {
+                      method: 'GET',
+                      mode: 'cors',
+                      headers
+                    })
+                      .then(res => res.json())
+                      .then((result) => {
+                        console.log(result[0].username);
+                        item.sender = result[0].username;
+                      })
+                  )
+                }))
+
+                Promise.all(promises)
+                  .then(() => {
+                    setMessages(messageArray);
+                    setMessageDataLoaded(true);
+                    props.updateMessageViewComponent(false);
+                    forcedUpdate();
+                  })
+              })
           }
         })
     } else {
       setMessages([]);
     }
-    
   }
   // ************************************************************ END FETCH FUNCTIONS ***************************************************** //
   // ************************************************************** RENDER FUNCTIONS ******************************************************* //
   let renderMessageData = () => {
-    //fetchGroupMessageData();
+    // conditions should be met for this when clicking a new group or adding a message to the current one
     if (props.messagesNeedUpdating && !isEmptyObject(props.groupData)) {
-      console.log('here');
+      console.log('fetchGroupMessageData()')
       fetchGroupMessageData();
     }
-    
 
-    console.log('messages ', messages);
     if (messageDataLoaded) {
-      console.log('MESSAGE ARRAY : ', messageArray);
+      console.log('messages in renderMessageData', messages);
+      return (
+        <List className={classes.messageArea}>
+          {messages.map((message, index) => (
+            <ListItem key={index}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <ListItemText align="right" primary={`${message.content}`}></ListItemText>
+                </Grid>
+                <Grid item xs={12}>
+                  <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+        </List>
+      )
+    } else {
+      console.log('messages in latter half of renderMessageData', messages);
       return (
         
         <List className={classes.messageArea}>
@@ -132,61 +160,6 @@ export default function GroupTitle (props){
         </List>
       )
     }
-    if (isEmptyObject(props.groupData)) {
-      return (
-        <List className={classes.messageArea}>
-          {messages.map((message, index) => (
-            <ListItem key={index}>
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText align="right" primary={message.content}></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-          ))}
-        </List>
-      )
-
-    } else {
-      if (messageDataLoaded) {
-        return (
-          <List className={classes.messageArea}>
-            {messages.map((message, index) => (
-              <ListItem key={index}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <ListItemText align="right" primary={message.content}></ListItemText>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
-                  </Grid>
-                </Grid>
-              </ListItem>
-            ))}
-          </List>
-        )
-      } else {
-        return (
-          <List className={classes.messageArea}>
-            {messages.map((message, index) => (
-              <ListItem key={index}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <ListItemText align="right" primary={message.content}></ListItemText>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ListItemText align="right" secondary={`${message.sender} - ${message.time}`}></ListItemText>
-                  </Grid>
-                </Grid>
-              </ListItem>
-            ))}
-          </List>
-        )
-      }
-    }
   }
   // ************************************************************END RENDER FUNCTIONS ****************************************************** // 
   //Stores changes iin text field as things are typed
@@ -196,7 +169,6 @@ export default function GroupTitle (props){
   
   //when send button is clicked, adds item to messages
   const handleSend = () => {
-    console.log(props);
     let message = document.getElementById('message-input').value;
 
     let errorMessage = '';
@@ -223,7 +195,7 @@ export default function GroupTitle (props){
             } else {
               result = result.json()
                 .then((result) => {
-                  console.log('setting');
+                  console.log('result ', result);
                   setRecipientData(result);
                   recipients = result;
                 })
@@ -240,7 +212,7 @@ export default function GroupTitle (props){
                     recipients: packet
                   })
 
-                  console.log(bodyData);
+                  // THIS IS COMMENTED OUT FOR OFFLINE TESTING, UNCOMMENT IF THIS WASN'T CHANGED
                   fetch(SIGNAL_API.SEND_MANY_URL, {
                     agent,
                     method: 'POST',
@@ -251,7 +223,7 @@ export default function GroupTitle (props){
                     .then((result) => {
                       if (result.status === 200) {
                         let recipientIDs = [];
-                        for (let i = 0; i < recipients.length ; i++) {
+                        for (let i = 0; i < recipients.length; i++) {
                           recipientIDs.push(recipients[i].recipient_id)
                         }
                         let bodyData = JSON.stringify({
@@ -261,22 +233,21 @@ export default function GroupTitle (props){
                           message: message
                         })
 
-                        console.log('BODY DATA : ', bodyData);
-                        console.log('PROPS APP DATA : ', props.appData);
                         fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.SEND_MESSAGES_MANY_PATH}`, {
                           method: 'POST',
                           mode: 'cors',
                           headers,
                           body: bodyData
-                          
+
                         })
                           .then((result) => {
-                            console.log('RESULT : ', result);
                             if (result.status === 200) {
-                              console.log('RESULT ', result);
-
-                              //setMessages(result)
+                              // forcers the component to fully reload messages relevant to the current group id
+                              props.updateMessageViewComponent(true);
+                              setMessageDataLoaded(false);
+                              forcedUpdate();
                             } else {
+                              // error handling to be implemented
                               console.log('Something bad happened');
                             }
                           })
@@ -289,32 +260,25 @@ export default function GroupTitle (props){
           })
       }
     }
-    //setMessages([...messages, {'content':messageValue, 'time':'11:15','sender':'GlLaDOS'}])
   }
 
-    return (
-       <div>
-           <Grid container  direction="column" >
-              <GroupTitleModal groupData={props.groupData}/>
-           </Grid>         
-            <Grid item xs={9}>
-                {renderMessageData()}
-                <Divider />
-                <Grid container style={{padding: '20px'}} align='right'>
-                    <Grid item xs={11} align='right'>
-                        <TextField onChange={handleTyping} value={messageValue} id="message-input" label="Type Something" fullWidth />
-                    </Grid>
-                    <Grid xs={1} align='right'>
-                        <Fab color="primary" aria-label="add" onClick={handleSend}><SendIcon /></Fab>
-                    </Grid>
-                </Grid>
-            </Grid>
-        </div>
+  return (
+    <div>
+      <Grid container direction="column" >
+        <GroupTitleModal groupData={props.groupData} />
+      </Grid>
+      <Grid item xs={9}>
+        {renderMessageData()}
+        <Divider />
+        <Grid container style={{ padding: '20px' }} align='right'>
+          <Grid item xs={11} align='right'>
+            <TextField onChange={handleTyping} value={messageValue} id="message-input" label="Type Something" fullWidth />
+          </Grid>
+          <Grid xs={1} align='right'>
+            <Fab color="primary" aria-label="add" onClick={handleSend}><SendIcon /></Fab>
+          </Grid>
+        </Grid>
+      </Grid>
+    </div>
     )
 }
-
-
-
-/**{content:"The British are coming", time:'9:30', sender:"Paul"},
-    {content:"This is Sparta", time:'9:31',sender:"Sparticus"},
-    {content:"Nah fam, its our gold", time:'10:35',sender:"Nixon"} */
