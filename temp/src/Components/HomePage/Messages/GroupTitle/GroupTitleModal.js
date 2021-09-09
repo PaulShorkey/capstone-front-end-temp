@@ -511,6 +511,7 @@ export default function GroupTitleModal(props) {
 											showEditRecipient === element.recipient_id
 												? setShowEditRecipient(-1)
 												: setShowEditRecipient(element.recipient_id)
+											setDeleteRecipientConfirmation()
 										}}
 									>
 										<EditIcon variant='default' color='default' />
@@ -525,6 +526,7 @@ export default function GroupTitleModal(props) {
 												: setDeleteRecipientConfirmation(
 													element.recipient_id
 												  )
+											setShowEditRecipient()
 										}}
 									>
 										<DeleteForeverOutlinedIcon variant='outlined' />
