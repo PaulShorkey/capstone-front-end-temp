@@ -49,7 +49,7 @@ export const editRecipient = async (recipientId, updatedRecipientObj) => {
 export const deleteRecipient = async (recipientId) => {
 	try {
 		const deleteRecipient = await axios.delete(
-			`${API_DIRECTORY.URL} ${API_DIRECTORY.DELETE_RECIPIENTS_BY_ID}/${recipientId}`
+			`${API_DIRECTORY.URL}${API_DIRECTORY.DELETE_RECIPIENTS_BY_ID}/${recipientId}`
 		)
 
 		if (deleteRecipient.status === 200) {

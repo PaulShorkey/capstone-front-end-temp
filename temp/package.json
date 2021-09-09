@@ -27,6 +27,7 @@
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
+		"test:e2e-ci": "npx cypress run --env configFile=pipeline",
 		"eject": "react-scripts eject",
 		"format": "prettier --write \"**/*.{js,jsx}\"",
 		"lint": "eslint . --fix --ext .js",

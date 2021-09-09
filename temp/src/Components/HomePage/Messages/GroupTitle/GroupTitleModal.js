@@ -113,14 +113,15 @@ export default function GroupTitleModal(props) {
 							setLanguageDataLoaded(true)
 						})
 					}
+				},
+				// eslint-disable-next-line node/handle-callback-err
+				(error) => {
+					setError({
+						status: true,
+						type: ERROR_TYPES.FATAL,
+						message: ERROR_MESSAGES.ERROR_UNKNOWN
+					})
 				}
-				// (error) => {
-				//   setError({
-				//     status: true,
-				//     type: ERROR_TYPES.FATAL,
-				//     message: ERROR_MESSAGES.ERROR_UNKNOWN
-				//   })
-				// }
 			)
 		}
 	}
@@ -244,12 +245,8 @@ export default function GroupTitleModal(props) {
 					editRecipientFormData
 				)
 				console.log('edit res', editRecipientResponse)
-				if (editRecipientResponse.ok) {
-					setBannerMessage(editRecipientResponse.message)
-					setTimeout(() => {
-						setBannerMessage()
-					}, 1200)
-				}
+
+				fetchRecipientsData()
 			} catch (error) {
 				console.error(error)
 				setBannerMessage(error.message)
@@ -278,11 +275,10 @@ export default function GroupTitleModal(props) {
 
 			setDeleteRecipientConfirmation(false)
 			setBannerMessage(deleteResponse.message)
-			if (deleteResponse.ok) {
-				setTimeout(() => {
-					setBannerMessage('')
-				}, 1200)
-			}
+			setTimeout(() => {
+				setBannerMessage('')
+				fetchRecipientsData()
+			}, 1200)
 		} catch (error) {
 			setBannerMessage(error.message)
 		}
