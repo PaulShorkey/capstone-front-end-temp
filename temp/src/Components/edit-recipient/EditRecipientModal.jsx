@@ -9,7 +9,9 @@ const useStyles = makeStyles({
 	root: {
 		display: 'flex',
 		flexFlow: 'column nowrap',
-		alignContent: 'center'
+		alignContent: 'center',
+		width: '25em',
+		overflow: 'scroll'
 	},
 	input: {
 		marginBottom: '5%'
@@ -97,12 +99,12 @@ const EditRecipientModal = ({ editRecipientFormSubmit, editRecipientChangeHandle
 				/>
 				{languages.length > 0 && (
 					<label className={classes.inputBig}>
-						Preferred language:
-						<select ref={languageInputRef}>
-							{languages.map(({ language_id, trigraph_code }) => {
+						Language:
+						<select ref={languageInputRef} style={{ minWidth: 50 }}>
+							{languages.map(({ language_id, language_trigraph_code }) => {
 								return (
 									<option key={language_id} value={language_id}>
-										{trigraph_code}
+										{language_trigraph_code}
 									</option>
 								)
 							})}
@@ -113,10 +115,10 @@ const EditRecipientModal = ({ editRecipientFormSubmit, editRecipientChangeHandle
 					<label className={classes.inputBig}>
 						Comm Method:
 						<select ref={commMethodRef}>
-							{commMethod.map(({ pc_id, name }) => {
+							{commMethod.map(({ pc_id, pc_name }) => {
 								return (
 									<option key={pc_id} value={pc_id}>
-										{name}
+										{pc_name}
 									</option>
 								)
 							})}

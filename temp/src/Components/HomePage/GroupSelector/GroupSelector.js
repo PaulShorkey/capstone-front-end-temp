@@ -102,7 +102,7 @@ export default function GroupSelector(props) {
 					{groupData.map((element, index) => (
 						<ListItem button key={index}>
 							<ListItemText
-								primary={element.name}
+								primary={element.group_name}
 								onClick={() => {
 									props.updateGroupTitleModal(element)
 								}}

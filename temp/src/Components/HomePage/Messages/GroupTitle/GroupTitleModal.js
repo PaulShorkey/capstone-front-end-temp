@@ -25,13 +25,13 @@ import DeleteRecipientModal from '../../../delete-recipient/DeleteRecipientModal
 const useStyles = makeStyles((theme) => ({
 	modal: {
 		display: 'flex',
-		alignItems: 'center',
+		flexFlow: 'row nowrap',
 		justifyContent: 'center',
-		overflow: 'hidden'
+		overflow: 'scroll',
+		height: '100%'
 	},
 	content: {
-		padding: 12,
-		overflow: 'scroll'
+		padding: 12
 	},
 	paper: {
 		backgroundColor: theme.palette.background.paper,
@@ -44,11 +44,12 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: theme.spacing(1)
 	},
 	root: {
+		width: '30em',
 		'& > *': {
 			margin: theme.spacing(1),
 			width: '25ch',
-			maxWidth: 280
-			// backgroundColor: theme.palette.background.paper
+			maxWidth: 280,
+			backgroundColor: theme.palette.background.paper
 		},
 		submit: {
 			margin: theme.spacing(3, 0, 2)
@@ -301,7 +302,7 @@ export default function GroupTitleModal(props) {
 			return (
 				<Grid item xs={3} button onClick={handleOpen}>
 					<ListItem alignItems='flex-start'>
-						<ListItemText>{props.groupData.name}</ListItemText>
+						<ListItemText>{props.groupData.group_name}</ListItemText>
 						<ListItemIcon>
 							<KeyboardArrowDownIcon />
 						</ListItemIcon>
@@ -323,7 +324,7 @@ export default function GroupTitleModal(props) {
 					<select name='language' id='language-drop-down'>
 						{languageData.map((item) => (
 							<option key={item.language_id} value={`${item.language_id}`}>
-								{`${item.name}`}
+								{`${item.language_trigraph_code}`}
 							</option>
 						))}
 					</select>
@@ -357,7 +358,7 @@ export default function GroupTitleModal(props) {
 							<option
 								key={item.pc_id}
 								value={`${item.pc_id}`}
-							>{`${item.name}`}</option>
+							>{`${item.pc_name}`}</option>
 						))}
 					</select>
 				</form>
@@ -519,8 +520,7 @@ export default function GroupTitleModal(props) {
 										onClick={() => {
 											deleteRecipientConfirmation === element.recipient_id
 												? setDeleteRecipientConfirmation(-1)
-												: setDeleteRecipientConfirmation(
-													element.recipient_id
+												: setDeleteRecipientConfirmation(element.recipient_id
 												  )
 											setShowEditRecipient()
 										}}
@@ -580,11 +580,11 @@ export default function GroupTitleModal(props) {
 			<Fade in={open}>
 				<div className={classes.paper}>
 					<h3>{bannerMessage}</h3>
-					<h2 id='transition-modal-title'>{`${props.groupData.name}`}</h2>
+					<h2 id='transition-modal-title'>{`${props.groupData.group_name}`}</h2>
 					<div className={classes.p}>
 						<p>{`Number of Users: ${numberOfRecipientsInGroup}`}</p>
-						<p>{`Created: ${props.groupData.time_made}`}</p>
-						<p>{`Description: ${props.groupData.description}`}</p>
+						<p>{`Created: ${props.groupData.group_time_made}`}</p>
+						<p>{`Description: ${props.groupData.group_description}`}</p>
 					</div>
 					<Divider />
 					<List component='nav' aria-label='main mailbox folders'>
