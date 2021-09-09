@@ -8,7 +8,14 @@ import { fetchLanguageData, fetchCommMethodsData } from '../../lib/interface.js'
 const useStyles = makeStyles({
 	root: {
 		display: 'flex',
-		flexFlow: 'column nowrap'
+		flexFlow: 'column nowrap',
+		alignContent: 'center'
+	},
+	input: {
+		marginBottom: '5%'
+	},
+	inputBig: {
+		marginBottom: '10%'
 	}
 })
 
@@ -59,29 +66,37 @@ const EditRecipientModal = ({ editRecipientFormSubmit, editRecipientChangeHandle
 	return (
 		<div className={classes.root}>
 			<h2 id='transition-modal-title'>Edit Recipient </h2>
-			<form onSubmit={submitForm}>
+			<form onSubmit={submitForm} className={classes.root}>
 				<TextField
 					name='first_name'
 					onChange={editRecipientChangeHandler}
 					placeholder={recipient.first_name}
+					helperText='first name'
+					className={classes.input}
 				/>
 				<TextField
 					name='middle_name'
 					onChange={editRecipientChangeHandler}
 					placeholder={recipient.middle_name}
+					helperText='middle name'
+					className={classes.input}
 				/>
 				<TextField
 					name='last_name'
 					onChange={editRecipientChangeHandler}
 					placeholder={recipient.last_name}
+					helperText='last name'
+					className={classes.input}
 				/>
 				<TextField
 					name='phone_number'
 					onChange={editRecipientChangeHandler}
 					placeholder={recipient.phone_number}
+					helperText='phone number'
+					className={classes.inputBig}
 				/>
 				{languages.length > 0 && (
-					<label>
+					<label className={classes.inputBig}>
 						Preferred language:
 						<select ref={languageInputRef}>
 							{languages.map(({ language_id, trigraph_code }) => {
@@ -95,7 +110,7 @@ const EditRecipientModal = ({ editRecipientFormSubmit, editRecipientChangeHandle
 					</label>
 				)}
 				{commMethod.length > 0 && (
-					<label>
+					<label className={classes.inputBig}>
 						Comm Method:
 						<select ref={commMethodRef}>
 							{commMethod.map(({ pc_id, name }) => {
@@ -110,9 +125,10 @@ const EditRecipientModal = ({ editRecipientFormSubmit, editRecipientChangeHandle
 				)}
 				<Button
 					type='submit'
-					className={classes.ModalButton}
-					variant='outlined'
+					variant='contained'
+					color='primary'
 					disabled={recipient.phone_number.length === 0}
+					className={classes.ModalButton}
 				>
 					Submit Changes
 				</Button>

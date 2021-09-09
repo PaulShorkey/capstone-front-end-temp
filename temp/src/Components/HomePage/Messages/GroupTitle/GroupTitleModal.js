@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GroupTitleModal(props) {
 	const classes = useStyles()
-	const [bannerMessage, setBannerMessage] = useState('')
+	const [bannerMessage, setBannerMessage] = useState()
 	const [open, setOpen] = React.useState(false)
 	const [addingRecipient, setAddingRecipient] = useState(false)
 	const [languageDataLoaded, setLanguageDataLoaded] = useState(false)
@@ -83,8 +83,8 @@ export default function GroupTitleModal(props) {
 	const [recipientsData, setRecipientsData] = useState([])
 	const [recipientsDataLoaded, setRecipientsDataLoaded] = useState(false)
 	const [numberOfRecipientsInGroup, setNumberOfRecipientsInGroup] = useState(0)
-	const [showEditRecipient, setShowEditRecipient] = useState(false)
-	const [deleteRecipientConfirmation, setDeleteRecipientConfirmation] = useState(false)
+	const [showEditRecipient, setShowEditRecipient] = useState()
+	const [deleteRecipientConfirmation, setDeleteRecipientConfirmation] = useState()
 	// eslint-disable-next-line no-unused-vars
 	const [error, setError] = useState({ status: false, type: 'message', message: 'No Error' })
 	const [editRecipientFormData, setEditRecipientFormData] = useState({
@@ -202,7 +202,7 @@ export default function GroupTitleModal(props) {
 		fetchLanguageData()
 		fetchCommMethodsData()
 		fetchRecipientsData()
-	}, [])
+	}, [setBannerMessage])
 
 	const handleOpen = () => {
 		if (!isEmptyObject(props.groupData)) {
@@ -221,7 +221,7 @@ export default function GroupTitleModal(props) {
 		return JSON.stringify(obj) === '{}'
 	}
 
-	const editRecipientFormSubmit = (event, recipientId, languageId, commMethodId) => {
+	const editRecipientFormSubmit = async (event, recipientId, languageId, commMethodId) => {
 		event.preventDefault()
 		let shouldTrigger = false
 		editRecipientFormData.preferred_language = languageId
@@ -239,7 +239,17 @@ export default function GroupTitleModal(props) {
 
 		if (shouldTrigger) {
 			try {
-				editRecipient(recipientId, editRecipientFormData)
+				const editRecipientResponse = await editRecipient(
+					recipientId,
+					editRecipientFormData
+				)
+				console.log('edit res', editRecipientResponse)
+				if (editRecipientResponse.ok) {
+					setBannerMessage(editRecipientResponse.message)
+					setTimeout(() => {
+						setBannerMessage()
+					}, 1200)
+				}
 			} catch (error) {
 				console.error(error)
 				setBannerMessage(error.message)
@@ -248,7 +258,7 @@ export default function GroupTitleModal(props) {
 				}, 1200)
 			}
 			setTimeout(() => {
-				setShowEditRecipient(false)
+				setShowEditRecipient()
 			}, 1200)
 		}
 	}
@@ -262,16 +272,20 @@ export default function GroupTitleModal(props) {
 	}
 
 	const deleteRecipientHandler = async (recipientId) => {
-		console.log('recip to delete', recipientId)
+		try {
+			const deleteResponse = await deleteRecipient(recipientId)
+			console.log('del res', deleteResponse)
 
-		const deleteResponse = await deleteRecipient(recipientId)
-		console.log('res', deleteResponse)
-
-		setDeleteRecipientConfirmation(false)
-		setBannerMessage(`Successfully deleted ${recipientId}`)
-		setTimeout(() => {
-			setBannerMessage('')
-		}, 1200)
+			setDeleteRecipientConfirmation(false)
+			setBannerMessage(deleteResponse.message)
+			if (deleteResponse.ok) {
+				setTimeout(() => {
+					setBannerMessage('')
+				}, 1200)
+			}
+		} catch (error) {
+			setBannerMessage(error.message)
+		}
 	}
 
 	// ************************************************** RENDER FUNCTIONS *************************************************** //
@@ -494,7 +508,9 @@ export default function GroupTitleModal(props) {
 										color='primary'
 										className={classes.editButton}
 										onClick={() => {
-											setShowEditRecipient(!showEditRecipient)
+											showEditRecipient === element.recipient_id
+												? setShowEditRecipient(-1)
+												: setShowEditRecipient(element.recipient_id)
 										}}
 									>
 										<EditIcon variant='default' color='default' />
@@ -504,16 +520,18 @@ export default function GroupTitleModal(props) {
 										color='secondary'
 										className={classes.deleteButton}
 										onClick={() => {
-											setDeleteRecipientConfirmation(
-												!deleteRecipientConfirmation
-											)
+											deleteRecipientConfirmation === element.recipient_id
+												? setDeleteRecipientConfirmation(-1)
+												: setDeleteRecipientConfirmation(
+													element.recipient_id
+												  )
 										}}
 									>
 										<DeleteForeverOutlinedIcon variant='outlined' />
 									</IconButton>
 								</ListItem>
 								<ListItem>
-									{showEditRecipient && (
+									{showEditRecipient === element.recipient_id && (
 										<EditRecipientModal
 											editRecipientFormSubmit={editRecipientFormSubmit}
 											editRecipientChangeHandler={editRecipientChangeHandler}
@@ -522,14 +540,14 @@ export default function GroupTitleModal(props) {
 										/>
 									)}
 								</ListItem>
-								{deleteRecipientConfirmation && (
+								{deleteRecipientConfirmation === element.recipient_id && (
 									<ListItem>
 										<DeleteRecipientModal
 											deleteRecipientHandler={deleteRecipientHandler}
 											recipientId={element.recipient_id}
-											cancelHandler={() =>
+											cancelHandler={() => {
 												setDeleteRecipientConfirmation(false)
-											}
+											}}
 										/>
 									</ListItem>
 								)}

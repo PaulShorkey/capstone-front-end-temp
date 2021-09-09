@@ -35,11 +35,14 @@ export const editRecipient = async (recipientId, updatedRecipientObj) => {
 		)
 
 		if (editRecipientResponse.status === 200) {
-			return `Successfully edited recipient ${recipientId}`
+			editRecipientResponse.message = `Successfully edited recipient ${recipientId}`
+			return editRecipientResponse
 		}
 	} catch (error) {
-		error.message = `Cannot update recipient ${recipientId}, ${updatedRecipientObj.phone_number}`
-		return error
+		return new Error({
+			...error,
+			message: `Cannot update recipient ${recipientId}, ${updatedRecipientObj.phone_number}`
+		})
 	}
 }
 
@@ -50,7 +53,8 @@ export const deleteRecipient = async (recipientId) => {
 		)
 
 		if (deleteRecipient.status === 200) {
-			return `Succesfully deleted ${recipientId}`
+			deleteRecipient.message = `Succesfully deleted ${recipientId}`
+			return deleteRecipient
 		}
 	} catch (error) {
 		return error
