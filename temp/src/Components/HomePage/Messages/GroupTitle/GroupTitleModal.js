@@ -197,7 +197,7 @@ export default function GroupTitleModal(props) {
       return (
         <Grid item xs={3} button onClick={handleOpen}>
           <ListItem alignItems='flex-start'>
-            <ListItemText >{props.groupData.name}</ListItemText>
+            <ListItemText >{props.groupData.group_name}</ListItemText>
             <ListItemIcon><KeyboardArrowDownIcon /></ListItemIcon>
           </ListItem>
         </Grid>
@@ -217,7 +217,7 @@ export default function GroupTitleModal(props) {
           <select name="language" id="language-drop-down">
             {
               languageData.map((item) => {
-                return <option value={`${item.language_id}`}>{`${item.name}`}</option>
+                return <option value={`${item.language_id}`}>{`${item.language_name}`}</option>
               })
             }
           </select>
@@ -251,7 +251,7 @@ export default function GroupTitleModal(props) {
           <select name="comm-methods" id="comm-methods-drop-down">
             {
               commMethods.map((item) => {
-                return <option value={`${item.pc_id}`}>{`${item.name}`}</option>
+                return <option value={`${item.pc_id}`}>{`${item.pc_name}`}</option>
               })
             }
           </select>
@@ -400,11 +400,11 @@ export default function GroupTitleModal(props) {
     return (
       <Fade in={open}>
         <div className={classes.paper}>
-          <h2 id="transition-modal-title">{`${props.groupData.name}`}</h2>
+          <h2 id="transition-modal-title">{`${props.groupData.group_name}`}</h2>
           <div className={classes.p}>
             <p>{`Number of Users: ${numberOfRecipientsInGroup}`}</p>
-            <p>{`Created: ${props.groupData.time_made}`}</p>
-            <p>{`Description: ${props.groupData.description}`}</p>
+            <p>{`Created: ${props.groupData.group_time_made}`}</p>
+            <p>{`Description: ${props.groupData.group_description}`}</p>
           </div>
           <Divider />
           <List component="nav" aria-label="main mailbox folders">

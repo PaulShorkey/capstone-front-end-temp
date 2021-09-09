@@ -6,6 +6,8 @@ import SignIn from './Components/SignIn/SignIn.js'
 import SignUp from './Components/SignIn/SignUp.js'
 import Home from './Components/HomePage/HomePage.js'
 import MustLogin from './Components/MustLogin';
+import AllRecipients from './Components/AllRecipients';
+import { AppBar } from '@material-ui/core';
 
 function App(props) {
   const [appData, setAppData] = useState({
@@ -31,6 +33,10 @@ function App(props) {
     return (
       <Router>
         <Switch>
+          <Route path="/Recipients">
+            
+            <AllRecipients />
+          </Route>
           <Route path="/Home">
             <Home appData={appData}/>
           </Route>

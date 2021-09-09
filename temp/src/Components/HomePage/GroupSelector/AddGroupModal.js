@@ -61,8 +61,8 @@ export default function AddGroupModal(props) {
         mode: 'cors',
         headers,
         body: JSON.stringify({
-          name: name,
-          description: description
+          group_name: name,
+          group_description: description
         })
       })
         .then((result) => {

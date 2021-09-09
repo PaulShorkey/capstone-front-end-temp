@@ -38,8 +38,6 @@ const useStyles = makeStyles({
     }
   });
   
-
-
 export default function GroupTitle (props){
     const classes = useStyles();
     //State for loggedIn user
@@ -56,9 +54,11 @@ export default function GroupTitle (props){
   let messageArray = [];
 
   //polling for latest messages
-  useEffect(() => {
-    
-  }, [messages])
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     fetchGroupMessageData()
+  //   }, 30000)
+  // }, [messages])
 
   // ************************************************************** FETCH FUNCTIONS ******************************************************* //
   let fetchRecipientData = () => {
@@ -80,7 +80,7 @@ export default function GroupTitle (props){
               .then((result) => {
                 messageArray = [];
                 for (let i = 0; i < result.length; i++) {
-                  messageArray.push({ 'content': result[i].content, 'time': result[i].time_made, 'sender': result[i].sender_id });
+                  messageArray.push({ 'content': result[i].smg_content, 'time': result[i].hr_time, 'sender': result[i].smg_sender_id });
                 }
                 
                 let promises = (messageArray.map(item => {
@@ -166,7 +166,8 @@ export default function GroupTitle (props){
   //when send button is clicked, adds item to messages
   const handleSend = () => {
     let message = document.getElementById('message-input').value;
-
+    setMessageValue('');
+    document.getElementById('message-input').value = '';
     let errorMessage = '';
 
     if (message === undefined || typeof message !== 'string' || message === '') errorMessage += 'Please Provide a Value for Message';
@@ -207,25 +208,34 @@ export default function GroupTitle (props){
                     recipients: packet
                   })
 
-                  // THIS IS COMMENTED OUT FOR OFFLINE TESTING, UNCOMMENT IF THIS WASN'T CHANGED
-                  fetch(SIGNAL_API.SEND_MANY_URL, {
+                  //THIS IS COMMENTED OUT FOR OFFLINE TESTING, UNCOMMENT IF THIS WASN'T CHANGED
+                  // fetch(SIGNAL_API.SEND_MANY_URL, {
+                  //   agent,
+                  //   method: 'POST',
+                  //   mode: 'cors',
+                  //   headers,
+                  //   body: bodyData
+                  // })
+                  fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.GROUPS_TABLE_PATH}`, {
                     agent,
-                    method: 'POST',
+                    method: 'GET',
                     mode: 'cors',
-                    headers,
-                    body: bodyData
+                    headers
                   })
                     .then((result) => {
+                      
                       if (result.status === 200) {
                         let recipientIDs = [];
                         for (let i = 0; i < recipients.length; i++) {
                           recipientIDs.push(recipients[i].recipient_id)
                         }
+                        let date = new Date().toUTCString()
                         let bodyData = JSON.stringify({
                           sender_id: props.appData.userData.user_id,
                           recipient_ids: recipientIDs,
                           recipient_group_id: props.groupData.group_id,
-                          message: message
+                          message: message,
+                          hr_time: date
                         })
 
                         fetch(`${API_DIRECTORY.URL}${API_DIRECTORY.SEND_MESSAGES_MANY_PATH}`, {

@@ -12,6 +12,8 @@ import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
+import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles({
   list: {
@@ -22,11 +24,29 @@ const useStyles = makeStyles({
   },
 });
 
+
+function RecipientsButton() {
+  let history = useHistory();
+
+  function handleClick() {
+    history.push("/Recipients");
+  }
+
+  return (
+    <ListItem button onClick={handleClick} key={'Manage Recipients'}>
+      <ListItemIcon>{<EditIcon />}</ListItemIcon>
+      <ListItemText primary={'Manage Recipients'} />
+    </ListItem>
+  )
+
+}
+
 export default function TemporaryDrawer() {
   const classes = useStyles();
   const [state, setState] = React.useState({
     left: false
   });
+
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -35,6 +55,8 @@ export default function TemporaryDrawer() {
 
     setState({ ...state, [anchor]: open });
   };
+
+
 
   const list = (anchor) => (
     <div
@@ -51,17 +73,28 @@ export default function TemporaryDrawer() {
             <ListItemText primary='Mercury'/>
       </ListItem>
       <ListItem key='Number of Groups'>
-            <ListItemText primary='Number of Groups'/>
-      </ListItem>
+          <ListItemText primary='Number of Groups' />
+        </ListItem>
       </List>
       <Divider />
       <List>
-        {['Add New Group', 'Manage Admins', 'Manage Recipients'].map((text, index) => (
+        <ListItem button key={'Add New Group'}>
+          <ListItemIcon>{<AddIcon />}</ListItemIcon>
+          <ListItemText primary={'Add New Group'} />
+        </ListItem>
+        <ListItem button key={'Manage Admins'}>
+          <ListItemIcon>{<EditIcon />}</ListItemIcon>
+          <ListItemText primary={'Manage Admins'} />
+        </ListItem>
+      
+        <RecipientsButton />
+       
+        {/* {['Add New Group', 'Manage Admins', 'Manage Recipients'].map((text, index) => (
           <ListItem button key={text}>
             <ListItemIcon>{index === 0 ? <AddIcon/> : <EditIcon />}</ListItemIcon>
             <ListItemText primary={text} />
           </ListItem>
-        ))}
+        ))} */}
       </List>
     </div>
   );

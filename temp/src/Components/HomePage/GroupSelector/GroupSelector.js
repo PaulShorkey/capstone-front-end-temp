@@ -99,12 +99,13 @@ export default function GroupSelector(props) {
   // ********************************************** RENDER FUNCTIONS ************************************************* //
   let renderGroupsSideBar = () => {
     if (dataLoaded) {
+      console.log('GROUP DATA', groupData);
       return (
         <List component="nav" aria-label="secondary mailbox folders">
           {groupData.map((element, index) => (
             <ListItem button key={index}>
               <ListItemText
-                primary={element.name}
+                primary={element.group_name}
                 onClick={ () => {props.updateGroupTitleModal(element)} } />
               <ListItemIcon>
                 <IconButton
