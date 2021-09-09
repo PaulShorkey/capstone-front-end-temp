@@ -36,7 +36,8 @@
     transform: rotate(360deg);
   }
 }
-.MuiButton-label {
+/* this ruins every button */
+/* .MuiButton-label {
 color: #fff;
 background-color: #3f51b5;
-}
+} */

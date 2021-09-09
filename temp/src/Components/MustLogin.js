@@ -1,15 +1,14 @@
-import React from 'react';
+/* eslint-disable no-useless-constructor */
+import React from 'react'
 
 class MustLogin extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+	constructor(props) {
+		super(props)
+	}
 
-    render(){
-        return (
-            <div>You Must Login to Access this portion of the site</div>
-        );
-    }
+	render() {
+		return <div>You Must Login to Access this portion of the site</div>
+	}
 }
 
-export default MustLogin;
+export default MustLogin

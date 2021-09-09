@@ -1,59 +1,87 @@
 {
-  "name": "temp",
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}",
-      "!<rootDir>/node_modules/",
-      "!<rootDir>/path/to/dir/"
-    ]
-  },
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^5.2.1",
-    "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "cypress": "^8.3.1",
-    "nodemon": "^2.0.12"
-  }
+	"name": "temp",
+	"jest": {
+		"collectCoverageFrom": [
+			"src/**/*.{js,jsx,ts,tsx}",
+			"!<rootDir>/node_modules/",
+			"!<rootDir>/path/to/dir/"
+		]
+	},
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"@material-ui/core": "^4.12.3",
+		"@material-ui/icons": "^4.11.2",
+		"@testing-library/jest-dom": "^5.14.1",
+		"@testing-library/react": "^11.2.7",
+		"@testing-library/user-event": "^12.8.3",
+		"axios": "^0.21.4",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"react-router-dom": "^5.2.1",
+		"react-scripts": "4.0.3",
+		"web-vitals": "^1.1.2"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test --collect-coverage",
+		"test:e2e-ci": "npx cypress run --env configFile=pipeline",
+		"eject": "react-scripts eject",
+		"format": "prettier --write \"**/*.{js,jsx}\"",
+		"lint": "eslint . --fix --ext .js",
+		"lint:fix": "eslint . --fix --ext .tsx,.js,.ts,.jsx",
+		"lint:ci": "eslint . --max-warnings 0 --ext .js,.jsx,.ts,.tsx"
+	},
+	"babel": {
+		"presets": [
+			"@babel/preset-env",
+			"@babel/preset-react"
+		]
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"@testing-library/cypress": "^8.0.1",
+		"cypress": "^8.3.1",
+		"cypress-jest-adapter": "^0.1.1",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-config-standard": "^16.0.3",
+		"eslint-plugin-cypress": "^2.11.3",
+		"eslint-plugin-import": "^2.24.2",
+		"eslint-plugin-jest": "^24.4.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"eslint-plugin-promise": "^5.1.0",
+		"eslint-plugin-react": "^7.25.1",
+		"nodemon": "^2.0.12",
+		"prettier": "^2.3.2"
+	},
+	"prettier": {
+		"jsxSingleQuote": true,
+		"singleQuote": true,
+		"semi": false,
+		"trailingComma": "none",
+		"tabWidth": 4,
+		"printWidth": 100,
+		"useTabs": true
+	}
 }

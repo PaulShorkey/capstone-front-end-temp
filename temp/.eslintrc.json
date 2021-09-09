@@ -1,0 +1,33 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true,
+		"jest": true
+	},
+	"extends": [
+		"plugin:react/recommended",
+		"standard",
+		"plugin:cypress/recommended"
+		
+	],
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 12,
+		"sourceType": "module"
+	},
+	"plugins": [
+		"react"
+	],
+	"rules": {
+		"space-before-function-paren": "off",
+		"camelcase": [0, { "ignoreDestructuring": true }],
+		"no-mixed-spaces-and-tabs":"off",
+		"no-tabs": "off",
+		"indent": [1, "tab"],
+		"quotes": [1, "single"],
+		"jsx-quotes":[1, "prefer-single"],
+		"react/prop-types": "off"
+	}
+}
